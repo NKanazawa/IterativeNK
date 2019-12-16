@@ -16,12 +16,12 @@ from deap import algorithms
 from deap import base
 from deap import benchmarks
 from deap.benchmarks.tools import hypervolume
-import src.emo as emo
+from . import emo as emo
 import copy
 from deap import creator
 from deap import tools
-from src.hv import HyperVolume
-from src.objectives import Objectives
+from .hv import HyperVolume
+from .objectives import Objectives
 from deap import cma
 import functools
 
@@ -134,23 +134,25 @@ def main():
     NGEN = 300
     eval_log = numpy.empty((0, 2), float)
     verbose = True
-    create_plot = True
     indlogs = list()
-    trueParetoLog = []
     allTF = []
     HVlog = []
 
     ref_cal = [1,1]
     sigmas = []
-    indAses = []
+
     detA = []
     sucrate = []
     indfirst_pc = []
 
     for phase in range(0, num_solutions):
         # The MO-CMA-ES algorithm takes a full population as argument
-        C = numpy.random.uniform(LOWBOUNDS, UPBOUNDS, N)
-        strategy = cma.Strategy(C, 0.1)
+        if (phase < obj):
+            m = numpy.random.uniform(LOWBOUNDS, UPBOUNDS, N)
+        else:
+            idx = numpy.random.uniform(0, obj)
+            m = numpy.ndarray([keeped_solution[idx][i] for i in range(0,N)])
+        strategy = cma.Strategy(m, 0.1)
         if (phase < obj):
             population = strategy.generate(creator.IndividualMin)
         else:
@@ -239,7 +241,7 @@ def main():
     trIndLog = transLogs(indlogs)
     df = pandas.DataFrame(trIndLog)
 
-    return trueParetoLog[-1], eval_log, df, HVlog, allTF, sigmas, indAses, sucrate, indfirst_pc, detA
+    return keeped_solution, eval_log, df, HVlog, allTF, sigmas, sucrate, detA
 
 
 def transLogs(logs):
