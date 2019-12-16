@@ -16,12 +16,12 @@ from deap import algorithms
 from deap import base
 from deap import benchmarks
 from deap.benchmarks.tools import hypervolume
-from . import emo as emo
+import emo
 import copy
 from deap import creator
 from deap import tools
-from .hv import HyperVolume
-from .objectives import Objectives
+from hv import HyperVolume
+from objectives import Objectives
 from deap import cma
 import functools
 
@@ -150,8 +150,9 @@ def main():
         if (phase < obj):
             m = numpy.random.uniform(LOWBOUNDS, UPBOUNDS, N)
         else:
-            idx = numpy.random.uniform(0, obj)
-            m = numpy.ndarray([keeped_solution[idx][i] for i in range(0,N)])
+            idx = numpy.random.randint(0, obj)
+            a = [keeped_solution[idx][i] for i in range(0,N)]
+            m = numpy.array(a)
         strategy = cma.Strategy(m, 0.1)
         if (phase < obj):
             population = strategy.generate(creator.IndividualMin)
