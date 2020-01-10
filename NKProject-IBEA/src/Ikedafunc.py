@@ -1,21 +1,11 @@
-import array
-import sys
-import random
-import json
-import subprocess
 import pandas
 
 import numpy
-import scipy
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-from math import sqrt
 
-from deap import algorithms
 from deap import base
-from deap import benchmarks
-from deap.benchmarks.tools import hypervolume
 import emo
 import copy
 from deap import creator
@@ -122,7 +112,6 @@ toolbox.register("evaluate", zdt1)
 
 def main():
     # The cma module uses the numpy random number generator
-    # ToDO:Implement restart strategy
     global trueUP, trueLOW
     trueLOW, trueUP = loadBoundary()
     numpy.random.seed()
@@ -147,13 +136,22 @@ def main():
 
     for phase in range(0, num_solutions):
         # The MO-CMA-ES algorithm takes a full population as argument
+        # ToDO:Implement several ideas of restart strategy
         if (phase < obj):
             m = numpy.random.uniform(LOWBOUNDS, UPBOUNDS, N)
+        # else:
+        # ramdomized-method
+        #     idx = numpy.random.randint(0, obj)
+        #     a = [keeped_solution[idx][i] for i in range(0,N)]
+        #     m = numpy.array(a)
         else:
-            idx = numpy.random.randint(0, obj)
+            # Rotated-ordering method
+            idx = phase % obj
             a = [keeped_solution[idx][i] for i in range(0,N)]
             m = numpy.array(a)
+
         strategy = cma.Strategy(m, 0.1)
+
         if (phase < obj):
             population = strategy.generate(creator.IndividualMin)
         else:
