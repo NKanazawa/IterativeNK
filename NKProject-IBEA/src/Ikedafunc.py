@@ -54,6 +54,7 @@ def zdt1(LOWBOUNDS, UPBOUNDS, hof, phase, ind):
     elif phase == 1:
         result = obj2
     else:
+        # TODO:Implement penalty for dominated solutions
         cand = creator.IndividualMax(gnm)
         cand.wholeFitness = [obj1, obj2]
         newset = copy.deepcopy(hof)
@@ -150,7 +151,7 @@ def main():
             a = [keeped_solution[idx][i] for i in range(0,N)]
             m = numpy.array(a)
 
-        strategy = cma.Strategy(m, 0.1)
+        strategy = cma.Strategy(m, 1)
 
         if (phase < obj):
             population = strategy.generate(creator.IndividualMin)
