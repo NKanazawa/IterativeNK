@@ -14,6 +14,7 @@ from hv import HyperVolume
 from objectives import Objectives
 from deap import cma
 import functools
+import Mahalanobis
 
 # Problem size
 N = 2
@@ -28,7 +29,7 @@ creator.create("IndividualMax", list, fitness=creator.FitnessMax, wholeFitness=N
                volOverBounds=0, isFeasible=True, paretoRank=0)
 
 
-def zdt1(LOWBOUNDS, UPBOUNDS, hof, phase, ind):
+def zdt1(LOWBOUNDS, UPBOUNDS, hof, phase, m, C, ind):
     gnm = []
     conresult = []
     ref = [300, 300]
@@ -60,11 +61,7 @@ def zdt1(LOWBOUNDS, UPBOUNDS, hof, phase, ind):
         newset = copy.deepcopy(hof)
         newset.append(cand)
         if len( emo.selFinal(newset, 200)) == len(hof):
-            # TODO:Think what method is better to give penalty
-            vechof1 = numpy.array([hof[0][i] for i in range(0,len(hof[0]))])
-            vechof2 = numpy.array([hof[1][i] for i in range(0,len(hof[1]))])
-            vecind = numpy.array([cand[i] for i in range(0,len(cand[0]))])
-            result = - numpy.minimum(numpy.linalg.norm(vecind - vechof1),numpy.linalg.norm(vecind - vechof2))
+            result = - 1000 * Mahalanobis.calcMahalanobis(C,m,numpy.ndarray(gnm))
         else:
             result = recHV(newset, ref)[1] - recHV(hof, ref)[1]
     ind.valConstr = conresult
@@ -164,7 +161,7 @@ def main():
             population = strategy.generate(creator.IndividualMin)
         else:
             population = strategy.generate(creator.IndividualMax)
-        fitnesses = toolbox.map(functools.partial(toolbox.evaluate, LOWBOUNDS, UPBOUNDS, keeped_solution,  phase),
+        fitnesses = toolbox.map(functools.partial(toolbox.evaluate, LOWBOUNDS, UPBOUNDS, keeped_solution,  phase, strategy.centroid,strategy.C),
                                 population)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = fit
