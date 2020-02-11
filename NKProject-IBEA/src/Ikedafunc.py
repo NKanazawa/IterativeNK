@@ -61,7 +61,7 @@ def zdt1(LOWBOUNDS, UPBOUNDS, hof, phase, m, C, ind):
         newset = copy.deepcopy(hof)
         newset.append(cand)
         if len( emo.selFinal(newset, 200)) == len(hof):
-            result = - 1000 * Mahalanobis.calcMahalanobis(C,m,numpy.ndarray(gnm))
+            result = - 1000 * Mahalanobis.calcMahalanobis(C,m,numpy.array(gnm))
         else:
             result = recHV(newset, ref)[1] - recHV(hof, ref)[1]
     ind.valConstr = conresult
@@ -203,7 +203,7 @@ def main():
 
             # Evaluate the individuals
             fitnesses = toolbox.map(
-                functools.partial(toolbox.evaluate, LOWBOUNDS, UPBOUNDS, keeped_solution, phase), population)
+                functools.partial(toolbox.evaluate, LOWBOUNDS, UPBOUNDS, keeped_solution, phase,strategy.centroid,strategy.C), population)
             for ind, fit in zip(population, fitnesses):
                 ind.fitness.values = fit
                 if ind.volViolation > 0:
