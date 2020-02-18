@@ -7,6 +7,6 @@ def calcMahalanobis(C,m,data):
     _,L,U = lu(C)
     invL = np.linalg.inv(L)
     invU = np.linalg.inv(U)
-    invC = np.dot(invU,invL)
+    invC = np.dot(np.dot(_.T,invU) ,invL)
     dist = np.dot(np.dot(diff.T,invC),diff)
     return dist
